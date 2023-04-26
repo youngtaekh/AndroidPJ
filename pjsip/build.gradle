@@ -30,6 +30,12 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 
+//    externalNativeBuild {
+//        ndkBuild {
+//            path 'src/main/jni/Android.mk'
+//        }
+//    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -46,6 +52,8 @@ android {
 }
 
 dependencies {
+//    implementation 'io.github.youngtaekh:android-util:0.1.4'
+    implementation project(path: ':common')
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'

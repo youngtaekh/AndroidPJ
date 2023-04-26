@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 rootProject.name = "AndroidPJ"
 include ':app'
 include ':pjsip'
+include ':common'
+project(':common').projectDir = file("../../AndroidUtil/common")
