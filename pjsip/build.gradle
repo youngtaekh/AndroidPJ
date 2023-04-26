@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+tasks.register('copySo', Copy) {
+    from '../../../../pjproject-2.10/pjsip-apps/src/swig/java/android/app/src/main/jniLibs'
+    into 'src/main/jniLibs'
+    include('**/*.so')
+}
+
+tasks.register('copyJava', Copy) {
+    from '../../../../pjproject-2.10/pjsip-apps/src/swig/java/android/app/src/main/java'
+    into 'src/main/java'
+    include('*/*/*/*.java')
+}
+
+tasks.withType(JavaCompile) { compileTask -> compileTask.dependsOn copySo }
+tasks.withType(JavaCompile) { compileTask -> compileTask.dependsOn copyJava }
+
+android {
+    namespace 'kr.young.pjsip'
+    compileSdk rootProject.ext.compileSDKVersion
+
+    defaultConfig {
+        minSdk rootProject.ext.minSDKVersion
+        targetSdk rootProject.ext.targetSDKVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
