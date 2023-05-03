@@ -55,9 +55,9 @@ class PJSIPObserverImpl private constructor(): PJSIPPublisher {
         messageObservers.remove(observer)
     }
 
-    override fun onIncomingCallObserver(call: CallEventListener, onIncomingCallParam: OnIncomingCallParam?) {
+    override fun onIncomingCallObserver(callInfo: CallInfo) {
         for (observer in this.registerObservers) {
-            observer.onIncomingCall(call, onIncomingCallParam)
+            observer.onIncomingCall(callInfo)
         }
     }
 
@@ -88,6 +88,24 @@ class PJSIPObserverImpl private constructor(): PJSIPPublisher {
     override fun onUnRegistrationFailedObserver(registrationInfo: RegistrationInfo) {
         for (observer in this.registerObservers) {
             observer.onUnRegistrationFailed(registrationInfo)
+        }
+    }
+
+    override fun onOutgoingCallObserver(callInfo: CallInfo) {
+        for (observer in this.callObservers) {
+            observer.onOutgoingCall(callInfo)
+        }
+    }
+
+    override fun onConnectedCallObserver(callInfo: CallInfo) {
+        for (observer in this.callObservers) {
+            observer.onConnectedCall(callInfo)
+        }
+    }
+
+    override fun onTerminatedCallObserver(callInfo: CallInfo) {
+        for (observer in this.callObservers) {
+            observer.onTerminatedCall(callInfo)
         }
     }
 

@@ -40,16 +40,17 @@ class UserAgent private constructor() {
         isIPv6 = false
     }
 
-    fun init(outboundProxyAddress: String,
-             userId: String,
-             userPassword: String,
-             stunServer: String,
-             turnServer: String,
-             turnUserName: String,
-             turnPassword: String,
-             type: TransportType) {
+    fun init(
+        outboundProxyAddress: String,
+        userId: String,
+        userPassword: String,
+        stunServer: String,
+        turnServer: String,
+        turnUserName: String,
+        turnPassword: String,
+        type: TransportType
+    ) {
         i(TAG, "init(Proxy, Id, Password, Stun, Turn)")
-        System.loadLibrary("pjsua2")
         this.type = type
         endPointImpl = EndPointImpl()
         epConfig = EpConfig()
@@ -58,8 +59,7 @@ class UserAgent private constructor() {
         /* Create endpoint */
         try {
             endPointImpl!!.libCreate()
-        } catch (e: java.lang.Exception) {
-        }
+        } catch (ignored: Exception) {}
 
         initLog()
         setUaConfig()
@@ -69,8 +69,7 @@ class UserAgent private constructor() {
 
         try {
             endPointImpl!!.libInit(epConfig)
-        } catch (e: Exception) {
-        }
+        } catch (ignored: Exception) {}
 
         setTransportConfig()
         setSipConfig(outboundProxyAddress, userId, userPassword)
@@ -111,11 +110,6 @@ class UserAgent private constructor() {
     }
 
     fun stop() {
-        /* Try force GC to avoid late destroy of PJ objects as they should be
-		 * deleted before lib is destroyed.
-		 */
-        Runtime.getRuntime().gc()
-
         /* Shutdown pjsua. Note that Endpoint destructor will also invoke
 		 * libDestroy(), so this will be a test of double libDestroy().
 		 */
@@ -272,7 +266,7 @@ class UserAgent private constructor() {
 
     companion object {
         private const val TAG = "UserAgent"
-        private const val LOG_LEVEL = 6L
+        private const val LOG_LEVEL = 4L
         const val USER_AGENT = "Android"
         const val SIP_PORT = 6000L
         const val TLS_TAIL = ";hide;transport=tls"

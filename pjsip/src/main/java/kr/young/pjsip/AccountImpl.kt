@@ -5,6 +5,7 @@ import kr.young.pjsip.model.MessageInfo
 import kr.young.pjsip.model.RegistrationInfo
 import kr.young.pjsip.observer.PJSIPObserverImpl
 import org.pjsip.pjsua2.*
+import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_RINGING
 
 class AccountImpl(
     val accountConfig: AccountConfig,
@@ -15,7 +16,12 @@ class AccountImpl(
     override fun onIncomingCall(prm: OnIncomingCallParam?) {
         i(TAG, "onIncomingCall")
         val call = CallEventListener(this, prm!!.callId, endpoint)
-        observerImpl.onIncomingCallObserver(call, prm)
+        //Send 180 Ringing
+        val callParam = CallOpParam()
+        callParam.statusCode = PJSIP_SC_RINGING
+        call.answer(callParam)
+        CallManager.instance.setCall(call)
+        observerImpl.onIncomingCallObserver(call.info)
     }
 
     override fun onRegStarted(prm: OnRegStartedParam?) {

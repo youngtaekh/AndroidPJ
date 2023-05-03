@@ -3,6 +3,7 @@ package kr.young.pjsip
 import kr.young.common.UtilLog.Companion.d
 import kr.young.pjsip.observer.PJSIPObserverImpl
 import org.pjsip.pjsua2.*
+import org.pjsip.pjsua2.pjsip_role_e.PJSIP_ROLE_UAC
 
 class CallEventListener(
     accountImpl: AccountImpl,
@@ -12,43 +13,29 @@ class CallEventListener(
     var vidWin: VideoWindow? = null
     var vidPrev: VideoPreview? = null
 
-    private var pjsipObserverImpl: PJSIPObserverImpl? = null
+    private val pjsipObserverImpl = PJSIPObserverImpl.instance
 
-    init {
-        pjsipObserverImpl = PJSIPObserverImpl.instance
-    }
-
-    override fun onCallState(prm: OnCallStateParam?) {
-        val callInfo = info
-        if (callInfo.state == pjsip_inv_state.PJSIP_INV_STATE_CONNECTING) {
-            d(TAG, "call state ${callInfo.state}")
-            d(TAG, "call account ${callInfo.accId}")
-            d(TAG, "call account ${callInfo.stateText}")
-
-            d(TAG, "event type ${prm!!.e.type}")
-            d(TAG, "tsx prevState ${prm.e.body.tsxState.prevState}")
-            d(TAG, "tsx type ${prm.e.body.tsxState.type}")
-            d(TAG, "tsx status ${prm.e.body.tsxState.src.status}")
-            d(TAG, "src address ${prm.e.body.tsxState.src.rdata.srcAddress}")
-            d(TAG, "tsx info ${prm.e.body.tsxState.src.rdata.info}")
-            d(TAG, "tsx rdata wholeMsg ${prm.e.body.tsxState.src.rdata.wholeMsg}")
-            d(TAG, "============================================================")
-        }
-        if (callInfo.state == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
-            endpoint.utilLogWrite(3, TAG, dump(true, ""))
+    override fun onCallState(callParam: OnCallStateParam?) {
+        when (info.state) {
+            pjsip_inv_state.PJSIP_INV_STATE_NULL -> { d(TAG, "PJSIP_INV_STATE_NULL") }
+            //Send INVITE
+            pjsip_inv_state.PJSIP_INV_STATE_CALLING -> { d(TAG, "PJSIP_INV_STATE_CALLING") }
+            pjsip_inv_state.PJSIP_INV_STATE_INCOMING -> { onIncomingCall() }
+            //Sending & Receive Ringing ...
+            pjsip_inv_state.PJSIP_INV_STATE_EARLY -> { early() }
+            //Receive Answer
+            pjsip_inv_state.PJSIP_INV_STATE_CONNECTING -> { onConnectingCall(callParam) }
+            //Connected
+            pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED -> { onConnectedCall() }
+            pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED -> { onDisconnectedCall() }
         }
 
-        pjsipObserverImpl!!.onCallStateObserver(callInfo, prm!!.e.body.tsxState.src.rdata.wholeMsg)
+//        pjsipObserverImpl.onCallStateObserver(info, callParam!!.e.body.tsxState.src.rdata.wholeMsg)
     }
 
     override fun onCallMediaState(prm: OnCallMediaStateParam?) {
-        val ci: CallInfo = try {
-            info
-        } catch (e: Exception) {
-            return
-        }
 
-        val callMediaInfoVector = ci.media
+        val callMediaInfoVector = info.media
 
         for (i in callMediaInfoVector.indices) {
             val cmi = callMediaInfoVector[i]
@@ -74,6 +61,45 @@ class CallEventListener(
         }
 
         pjsipObserverImpl!!.onCallMediaStateObserver()
+    }
+
+    private fun onIncomingCall() {
+        d(TAG, "PJSIP_INV_STATE_INCOMING")
+    }
+
+    private fun early() {
+        d(TAG, "PJSIP_INV_STATE_EARLY")
+        //role 0 - caller, 1 - callee
+        d(TAG, "call role ${info.role}")
+        if (info.role == PJSIP_ROLE_UAC) {
+            pjsipObserverImpl.onOutgoingCallObserver(info)
+        }
+    }
+
+    private fun onConnectingCall(callParam: OnCallStateParam?) {
+        d(TAG, "PJSIP_INV_STATE_CONNECTING")
+        d(TAG, "call remoteUri ${info.remoteUri}")
+        d(TAG, "call remoteContact ${info.remoteContact}")
+
+//        d(TAG, "event type ${callParam!!.e.type}")
+//        d(TAG, "tsx prevState ${callParam.e.body.tsxState.prevState}")
+//        d(TAG, "tsx type ${callParam.e.body.tsxState.type}")
+//        d(TAG, "tsx status ${callParam.e.body.tsxState.src.status}")
+//        d(TAG, "src address ${callParam.e.body.tsxState.src.rdata.srcAddress}")
+//        d(TAG, "tsx info ${callParam.e.body.tsxState.src.rdata.info}")
+//        d(TAG, "tsx rdata wholeMsg ${callParam.e.body.tsxState.src.rdata.wholeMsg}")
+        d(TAG, "============================================================")
+    }
+
+    private fun onConnectedCall() {
+        d(TAG, "PJSIP_INV_STATE_CONFIRMED")
+        pjsipObserverImpl.onConnectedCallObserver(info)
+    }
+
+    private fun onDisconnectedCall() {
+        d(TAG, "PJSIP_INV_STATE_DISCONNECTED")
+        pjsipObserverImpl.onTerminatedCallObserver(info)
+        endpoint.utilLogWrite(3, TAG, dump(true, ""))
     }
 
     companion object {

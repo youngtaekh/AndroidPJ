@@ -15,13 +15,16 @@ interface PJSIPPublisher {
     fun add(observer: PJSIPObserver.Message)
     fun remove(observer: PJSIPObserver.Message)
 
-    fun onIncomingCallObserver(call: CallEventListener, onIncomingCallParam: OnIncomingCallParam?)
+    fun onIncomingCallObserver(callInfo: CallInfo)
     fun onRegStartedObserver(onRegStartedParam: OnRegStartedParam?)
     fun onRegistrationSuccessObserver(registrationInfo: RegistrationInfo)
     fun onRegistrationFailedObserver(registrationInfo: RegistrationInfo)
     fun onUnRegistrationSuccessObserver(registrationInfo: RegistrationInfo)
     fun onUnRegistrationFailedObserver(registrationInfo: RegistrationInfo)
 
+    fun onOutgoingCallObserver(callInfo: CallInfo)
+    fun onConnectedCallObserver(callInfo: CallInfo)
+    fun onTerminatedCallObserver(callInfo: CallInfo)
     fun onCallStateObserver(callInfo: CallInfo, wholeMsg: String?)
     fun onCallMediaStateObserver()
 

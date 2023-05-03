@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">AndroidPJ</string>
+    <string name="register">Register</string>
+    <string name="unregister">Unregister</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="busy">Busy</string>
+    <string name="update">Update</string>
+    <string name="re_invite">ReInvite</string>
+    <string name="cancel">Cancel</string>
+    <string name="end">End</string>
+    <string name="counterpart">Counterpart</string>
+
+    <string name="call_description">Call</string>
+    <string name="message_description">Message</string>
 </resources>

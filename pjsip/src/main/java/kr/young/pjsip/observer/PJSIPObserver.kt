@@ -7,7 +7,7 @@ import org.pjsip.pjsua2.*
 
 interface PJSIPObserver {
     interface Register {
-        fun onIncomingCall(call: CallEventListener, onIncomingCallParam: OnIncomingCallParam?)
+        fun onIncomingCall(callInfo: CallInfo)
         fun onRegStarted(onRegStartedParam: OnRegStartedParam?)
         fun onRegistrationSuccess(registrationInfo: RegistrationInfo)
         fun onRegistrationFailed(registrationInfo: RegistrationInfo)
@@ -15,6 +15,9 @@ interface PJSIPObserver {
         fun onUnRegistrationFailed(registrationInfo: RegistrationInfo)
     }
     interface Call {
+        fun onOutgoingCall(callInfo: CallInfo)
+        fun onConnectedCall(callInfo: CallInfo)
+        fun onTerminatedCall(callInfo: CallInfo)
         fun onCallState(callInfo: CallInfo, wholeMsg: String?)
         fun onCallMediaState()
     }
