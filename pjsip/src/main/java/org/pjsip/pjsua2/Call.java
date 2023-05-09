@@ -188,6 +188,10 @@ public class Call {
     pjsua2JNI.Call_vidSetStream(swigCPtr, this, op, CallVidSetStreamParam.getCPtr(param), param);
   }
 
+  public void audStreamModifyCodecParam(int med_idx, CodecParam param) throws java.lang.Exception {
+    pjsua2JNI.Call_audStreamModifyCodecParam(swigCPtr, this, med_idx, CodecParam.getCPtr(param), param);
+  }
+
   public StreamInfo getStreamInfo(long med_idx) throws java.lang.Exception {
     return new StreamInfo(pjsua2JNI.Call_getStreamInfo(swigCPtr, this, med_idx), true);
   }
@@ -224,6 +228,10 @@ public class Call {
     if (getClass() == Call.class) pjsua2JNI.Call_onCallSdpCreated(swigCPtr, this, OnCallSdpCreatedParam.getCPtr(prm), prm); else pjsua2JNI.Call_onCallSdpCreatedSwigExplicitCall(swigCPtr, this, OnCallSdpCreatedParam.getCPtr(prm), prm);
   }
 
+  public void onStreamPreCreate(OnStreamPreCreateParam prm) {
+    if (getClass() == Call.class) pjsua2JNI.Call_onStreamPreCreate(swigCPtr, this, OnStreamPreCreateParam.getCPtr(prm), prm); else pjsua2JNI.Call_onStreamPreCreateSwigExplicitCall(swigCPtr, this, OnStreamPreCreateParam.getCPtr(prm), prm);
+  }
+
   public void onStreamCreated(OnStreamCreatedParam prm) {
     if (getClass() == Call.class) pjsua2JNI.Call_onStreamCreated(swigCPtr, this, OnStreamCreatedParam.getCPtr(prm), prm); else pjsua2JNI.Call_onStreamCreatedSwigExplicitCall(swigCPtr, this, OnStreamCreatedParam.getCPtr(prm), prm);
   }
@@ -234,6 +242,10 @@ public class Call {
 
   public void onDtmfDigit(OnDtmfDigitParam prm) {
     if (getClass() == Call.class) pjsua2JNI.Call_onDtmfDigit(swigCPtr, this, OnDtmfDigitParam.getCPtr(prm), prm); else pjsua2JNI.Call_onDtmfDigitSwigExplicitCall(swigCPtr, this, OnDtmfDigitParam.getCPtr(prm), prm);
+  }
+
+  public void onDtmfEvent(OnDtmfEventParam prm) {
+    if (getClass() == Call.class) pjsua2JNI.Call_onDtmfEvent(swigCPtr, this, OnDtmfEventParam.getCPtr(prm), prm); else pjsua2JNI.Call_onDtmfEventSwigExplicitCall(swigCPtr, this, OnDtmfEventParam.getCPtr(prm), prm);
   }
 
   public void onCallTransferRequest(OnCallTransferRequestParam prm) {

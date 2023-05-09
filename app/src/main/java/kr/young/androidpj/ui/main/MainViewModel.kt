@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import kr.young.common.UtilLog.Companion.d
 import kr.young.pjsip.CallManager
 import kr.young.pjsip.UserAgent
-import org.pjsip.pjsua2.CallOpParam
-import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_DECLINE
 
 class MainViewModel : ViewModel() {
     private val callManager = CallManager.instance
@@ -37,6 +35,10 @@ class MainViewModel : ViewModel() {
 
     fun stopRegistration() {
         callManager.stopRegistration()
+    }
+
+    fun refreshRegistration() {
+        callManager.onNetworkChanged()
     }
 
     fun makeCall(counterpart: String) {
@@ -76,9 +78,9 @@ class MainViewModel : ViewModel() {
     companion object {
         private const val TAG = "MainViewModel"
         const val OUTBOUND_ADDRESS = "sip:sip.linphone.org"
-        const val OUTBOUND_PORT = "5060"
+        const val OUTBOUND_PORT = "5061"
         const val REGISTRATION_DURATION = "900"
-        val transport = UserAgent.TransportType.UDP
+        val transport = UserAgent.TransportType.TLS
 
         const val USER_ID = "sip:everareen@sip.linphone.org"
         const val COUNTERPART = "youngtaek.people"

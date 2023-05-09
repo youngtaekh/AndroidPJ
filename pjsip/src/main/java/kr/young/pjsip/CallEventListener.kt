@@ -60,7 +60,7 @@ class CallEventListener(
             }
         }
 
-        pjsipObserverImpl!!.onCallMediaStateObserver()
+        pjsipObserverImpl.onCallMediaStateObserver()
     }
 
     private fun onIncomingCall() {
@@ -70,9 +70,11 @@ class CallEventListener(
     private fun early() {
         d(TAG, "PJSIP_INV_STATE_EARLY")
         //role 0 - caller, 1 - callee
-        d(TAG, "call role ${info.role}")
         if (info.role == PJSIP_ROLE_UAC) {
+            d(TAG, "call role PJSIP_ROLE_UAC")
             pjsipObserverImpl.onOutgoingCallObserver(info)
+        } else {
+            d(TAG, "call role PJSIP_ROLE_UAS")
         }
     }
 

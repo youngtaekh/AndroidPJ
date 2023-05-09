@@ -52,6 +52,22 @@ public class AccountNatConfig extends PersistentObject {
     return pjsua2JNI.AccountNatConfig_mediaStunUse_get(swigCPtr, this);
   }
 
+  public void setSipUpnpUse(int value) {
+    pjsua2JNI.AccountNatConfig_sipUpnpUse_set(swigCPtr, this, value);
+  }
+
+  public int getSipUpnpUse() {
+    return pjsua2JNI.AccountNatConfig_sipUpnpUse_get(swigCPtr, this);
+  }
+
+  public void setMediaUpnpUse(int value) {
+    pjsua2JNI.AccountNatConfig_mediaUpnpUse_set(swigCPtr, this, value);
+  }
+
+  public int getMediaUpnpUse() {
+    return pjsua2JNI.AccountNatConfig_mediaUpnpUse_get(swigCPtr, this);
+  }
+
   public void setNat64Opt(int value) {
     pjsua2JNI.AccountNatConfig_nat64Opt_set(swigCPtr, this, value);
   }
@@ -66,6 +82,14 @@ public class AccountNatConfig extends PersistentObject {
 
   public boolean getIceEnabled() {
     return pjsua2JNI.AccountNatConfig_iceEnabled_get(swigCPtr, this);
+  }
+
+  public void setIceTrickle(int value) {
+    pjsua2JNI.AccountNatConfig_iceTrickle_set(swigCPtr, this, value);
+  }
+
+  public int getIceTrickle() {
+    return pjsua2JNI.AccountNatConfig_iceTrickle_get(swigCPtr, this);
   }
 
   public void setIceMaxHostCands(int value) {

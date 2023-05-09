@@ -4,13 +4,13 @@ plugins {
 }
 
 tasks.register('copySo', Copy) {
-    from '../../../../pjproject-2.10/pjsip-apps/src/swig/java/android/app/src/main/jniLibs'
+    from '../../../../pjproject-2.13/pjsip-apps/src/swig/java/android/pjsua2/src/main/jniLibs'
     into 'src/main/jniLibs'
     include('**/*.so')
 }
 
 tasks.register('copyJava', Copy) {
-    from '../../../../pjproject-2.10/pjsip-apps/src/swig/java/android/app/src/main/java'
+    from '../../../../pjproject-2.13/pjsip-apps/src/swig/java/android/pjsua2/src/main/java'
     into 'src/main/java'
     include('*/*/*/*.java')
 }

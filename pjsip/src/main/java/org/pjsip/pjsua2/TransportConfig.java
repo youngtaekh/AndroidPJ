@@ -52,6 +52,14 @@ public class TransportConfig extends PersistentObject {
     return pjsua2JNI.TransportConfig_portRange_get(swigCPtr, this);
   }
 
+  public void setRandomizePort(boolean value) {
+    pjsua2JNI.TransportConfig_randomizePort_set(swigCPtr, this, value);
+  }
+
+  public boolean getRandomizePort() {
+    return pjsua2JNI.TransportConfig_randomizePort_get(swigCPtr, this);
+  }
+
   public void setPublicAddress(String value) {
     pjsua2JNI.TransportConfig_publicAddress_set(swigCPtr, this, value);
   }

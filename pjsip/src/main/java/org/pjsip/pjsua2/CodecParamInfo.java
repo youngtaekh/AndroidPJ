@@ -84,6 +84,14 @@ public class CodecParamInfo {
     return pjsua2JNI.CodecParamInfo_frameLen_get(swigCPtr, this);
   }
 
+  public void setEncFrameLen(long value) {
+    pjsua2JNI.CodecParamInfo_encFrameLen_set(swigCPtr, this, value);
+  }
+
+  public long getEncFrameLen() {
+    return pjsua2JNI.CodecParamInfo_encFrameLen_get(swigCPtr, this);
+  }
+
   public void setPcmBitsPerSample(long value) {
     pjsua2JNI.CodecParamInfo_pcmBitsPerSample_set(swigCPtr, this, value);
   }

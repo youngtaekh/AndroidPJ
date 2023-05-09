@@ -60,6 +60,14 @@ public class AccountIpChangeConfig {
     return pjsua2JNI.AccountIpChangeConfig_reinviteFlags_get(swigCPtr, this);
   }
 
+  public void setReinvUseUpdate(long value) {
+    pjsua2JNI.AccountIpChangeConfig_reinvUseUpdate_set(swigCPtr, this, value);
+  }
+
+  public long getReinvUseUpdate() {
+    return pjsua2JNI.AccountIpChangeConfig_reinvUseUpdate_get(swigCPtr, this);
+  }
+
   public void readObject(ContainerNode node) throws java.lang.Exception {
     pjsua2JNI.AccountIpChangeConfig_readObject(swigCPtr, this, ContainerNode.getCPtr(node), node);
   }

@@ -70,6 +70,15 @@ public class OnCallReplaceRequestParam {
     return (cPtr == 0) ? null : new CallSetting(cPtr, false);
   }
 
+  public void setNewCall(Call value) {
+    pjsua2JNI.OnCallReplaceRequestParam_newCall_set(swigCPtr, this, Call.getCPtr(value), value);
+  }
+
+  public Call getNewCall() {
+    long cPtr = pjsua2JNI.OnCallReplaceRequestParam_newCall_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new Call(cPtr, false);
+  }
+
   public OnCallReplaceRequestParam() {
     this(pjsua2JNI.new_OnCallReplaceRequestParam(), true);
   }

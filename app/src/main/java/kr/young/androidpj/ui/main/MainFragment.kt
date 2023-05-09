@@ -48,6 +48,8 @@ class MainFragment: Fragment(),
         binding.tvRegister.setOnTouchListener(this)
         binding.tvUnregister.setOnClickListener(this)
         binding.tvUnregister.setOnTouchListener(this)
+        binding.tvRefresh.setOnClickListener(this)
+        binding.tvRefresh.setOnTouchListener(this)
         binding.ivCall.setOnClickListener(this)
         binding.ivCall.setOnTouchListener(this)
         binding.ivMessage.setOnClickListener(this)
@@ -88,6 +90,7 @@ class MainFragment: Fragment(),
         when (v?.id) {
             R.id.tv_register -> { viewModel.startRegistration() }
             R.id.tv_unregister -> { viewModel.stopRegistration() }
+            R.id.tv_refresh -> { viewModel.refreshRegistration() }
             R.id.iv_call -> { viewModel.makeCall(binding.etCounterpart.text.toString()) }
             R.id.tv_accept -> { viewModel.answerCall() }
             R.id.tv_decline -> { viewModel.declineCall() }
@@ -197,11 +200,13 @@ class MainFragment: Fragment(),
         if (isRegister) {
             binding.tvRegister.visibility = GONE
             binding.tvUnregister.visibility = VISIBLE
+            binding.tvRefresh.visibility = VISIBLE
             binding.ivCall.visibility = VISIBLE
             binding.ivMessage.visibility = VISIBLE
         } else {
             binding.tvRegister.visibility = VISIBLE
             binding.tvUnregister.visibility = GONE
+            binding.tvRefresh.visibility = GONE
             binding.ivCall.visibility = GONE
             binding.ivMessage.visibility = GONE
         }

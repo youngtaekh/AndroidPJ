@@ -1,12 +1,12 @@
 package kr.young.pjsip
 
 import kr.young.common.UtilLog.Companion.d
+import kr.young.pjsip.util.CustomHeader
 import org.pjsip.pjsua2.CallOpParam
 import org.pjsip.pjsua2.SdpSession
+import org.pjsip.pjsua2.SipHeaderVector
 import org.pjsip.pjsua2.pjsip_status_code
 import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_OK
-import org.pjsip.pjsua2.pjsua_call_flag.PJSUA_CALL_NO_SDP_OFFER
-import kotlin.reflect.typeOf
 
 class CallManager private constructor() {
 
@@ -50,24 +50,32 @@ class CallManager private constructor() {
     fun makeCall(counterpart: String) {
         call = CallEventListener(userAgent.accountImpl!!, -1, userAgent.endPointImpl!!)
         val callParam = CallOpParam(true)
+        callParam.txOption.headers = SipHeaderVector(arrayOf())
+        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "make call"))
         call?.makeCall("sip:$counterpart@sip.linphone.org", callParam)
     }
 
     fun answerCall() {
         val callParam = CallOpParam()
         callParam.statusCode = PJSIP_SC_OK
+        callParam.txOption.headers = SipHeaderVector(arrayOf())
+        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "answer call"))
         call?.answer(callParam)
     }
 
     fun busyCall() {
         val callParam = CallOpParam()
         callParam.statusCode = pjsip_status_code.PJSIP_SC_BUSY_EVERYWHERE
+        callParam.txOption.headers = SipHeaderVector(arrayOf())
+        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "busy call"))
         call?.hangup(callParam)
     }
 
     fun declineCall() {
         val callParam = CallOpParam()
         callParam.statusCode = pjsip_status_code.PJSIP_SC_DECLINE
+        callParam.txOption.headers = SipHeaderVector(arrayOf())
+        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "decline call"))
         call?.hangup(callParam)
     }
 
@@ -83,12 +91,22 @@ class CallManager private constructor() {
     }
 
     fun reInviteCall() {
-        call?.reinvite(CallOpParam(true))
+        val callParam = CallOpParam(true)
+        //No work
+        callParam.txOption.headers = SipHeaderVector(arrayOf())
+        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "reInvite call"))
+        call?.reinvite(callParam)
     }
 
     fun endCall() {
         val callParam = CallOpParam()
+        callParam.txOption.headers = SipHeaderVector(arrayOf())
+        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "hangup call"))
         call?.hangup(callParam)
+    }
+
+    fun onNetworkChanged() {
+        userAgent.onNetworkChanged()
     }
 
     fun setCall(call: CallEventListener?) {

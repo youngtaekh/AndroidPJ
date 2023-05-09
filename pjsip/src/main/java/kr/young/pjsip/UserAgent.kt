@@ -83,7 +83,7 @@ class UserAgent private constructor() {
         } else {
             setIpv6(pjsua_ipv6_use.PJSUA_IPV6_DISABLED)
         }
-        setIceEnable(!forAsterisk!!)
+        setIceEnable(true)
         if (!forAsterisk!!) {
             setTurnServer(turnServer, turnUserName, turnPassword)
         }
@@ -262,6 +262,11 @@ class UserAgent private constructor() {
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun onNetworkChanged() {
+        val param = IpChangeParam()
+        endPointImpl?.handleIpChange(param)
     }
 
     companion object {

@@ -102,6 +102,30 @@ public class CodecParamSetting {
     return (cPtr == 0) ? null : new CodecFmtpVector(cPtr, false);
   }
 
+  public void setPacketLoss(long value) {
+    pjsua2JNI.CodecParamSetting_packetLoss_set(swigCPtr, this, value);
+  }
+
+  public long getPacketLoss() {
+    return pjsua2JNI.CodecParamSetting_packetLoss_get(swigCPtr, this);
+  }
+
+  public void setComplexity(long value) {
+    pjsua2JNI.CodecParamSetting_complexity_set(swigCPtr, this, value);
+  }
+
+  public long getComplexity() {
+    return pjsua2JNI.CodecParamSetting_complexity_get(swigCPtr, this);
+  }
+
+  public void setCbr(boolean value) {
+    pjsua2JNI.CodecParamSetting_cbr_set(swigCPtr, this, value);
+  }
+
+  public boolean getCbr() {
+    return pjsua2JNI.CodecParamSetting_cbr_get(swigCPtr, this);
+  }
+
   public CodecParamSetting() {
     this(pjsua2JNI.new_CodecParamSetting(), true);
   }
