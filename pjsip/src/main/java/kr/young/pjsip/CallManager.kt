@@ -2,10 +2,7 @@ package kr.young.pjsip
 
 import kr.young.common.UtilLog.Companion.d
 import kr.young.pjsip.util.CustomHeader
-import org.pjsip.pjsua2.CallOpParam
-import org.pjsip.pjsua2.SdpSession
-import org.pjsip.pjsua2.SipHeaderVector
-import org.pjsip.pjsua2.pjsip_status_code
+import org.pjsip.pjsua2.*
 import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_OK
 
 class CallManager private constructor() {
@@ -71,6 +68,12 @@ class CallManager private constructor() {
         call?.hangup(callParam)
     }
 
+    fun ringingCall() {
+        val callParam = CallOpParam()
+        callParam.statusCode = pjsip_status_code.PJSIP_SC_RINGING
+        call?.answer(callParam)
+    }
+
     fun declineCall() {
         val callParam = CallOpParam()
         callParam.statusCode = pjsip_status_code.PJSIP_SC_DECLINE
@@ -96,6 +99,12 @@ class CallManager private constructor() {
         callParam.txOption.headers = SipHeaderVector(arrayOf())
         callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "reInvite call"))
         call?.reinvite(callParam)
+    }
+
+    fun sendRequest() {
+        val requestParam = CallSendRequestParam()
+        requestParam.method = "INFO"
+        call?.sendRequest(requestParam)
     }
 
     fun endCall() {

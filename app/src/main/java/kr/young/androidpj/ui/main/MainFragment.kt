@@ -60,6 +60,8 @@ class MainFragment: Fragment(),
         binding.tvDecline.setOnTouchListener(this)
         binding.tvBusy.setOnClickListener(this)
         binding.tvBusy.setOnTouchListener(this)
+        binding.tvRinging.setOnClickListener(this)
+        binding.tvRinging.setOnTouchListener(this)
         binding.tvUpdate.setOnClickListener(this)
         binding.tvUpdate.setOnTouchListener(this)
         binding.tvReInvite.setOnClickListener(this)
@@ -95,6 +97,7 @@ class MainFragment: Fragment(),
             R.id.tv_accept -> { viewModel.answerCall() }
             R.id.tv_decline -> { viewModel.declineCall() }
             R.id.tv_busy -> { viewModel.busyCall() }
+            R.id.tv_ringing -> { viewModel.ringingCall() }
             R.id.tv_update -> { viewModel.updateCall() }
             R.id.tv_re_invite -> { viewModel.reInviteCall() }
             R.id.tv_end -> { viewModel.endCall() }
@@ -116,6 +119,7 @@ class MainFragment: Fragment(),
             binding.tvAccept.visibility = VISIBLE
             binding.tvDecline.visibility = VISIBLE
             binding.tvBusy.visibility = VISIBLE
+            binding.tvRinging.visibility = VISIBLE
             binding.tvUpdate.visibility = GONE
             binding.tvReInvite.visibility = GONE
             binding.tvEnd.visibility = GONE
@@ -153,6 +157,7 @@ class MainFragment: Fragment(),
             binding.tvAccept.visibility = GONE
             binding.tvDecline.visibility = GONE
             binding.tvBusy.visibility = GONE
+            binding.tvRinging.visibility = GONE
             binding.tvUpdate.visibility = VISIBLE
             binding.tvReInvite.visibility = GONE
             binding.tvEnd.setText(R.string.cancel)
@@ -163,9 +168,11 @@ class MainFragment: Fragment(),
     override fun onConnectedCall(callInfo: CallInfo) {
         d(TAG, "onConnectedCall")
         requireActivity().runOnUiThread {
+            binding.clCall.visibility = VISIBLE
             binding.tvAccept.visibility = GONE
             binding.tvDecline.visibility = GONE
             binding.tvBusy.visibility = GONE
+            binding.tvRinging.visibility = GONE
             binding.tvUpdate.visibility = VISIBLE
             binding.tvReInvite.visibility = VISIBLE
             binding.tvEnd.setText(R.string.end)

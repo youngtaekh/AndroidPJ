@@ -60,9 +60,14 @@ class MainViewModel : ViewModel() {
         callManager.busyCall()
     }
 
+    fun ringingCall() {
+        callManager.ringingCall()
+    }
+
     fun updateCall() {
         d(TAG, "updateCall")
         callManager.updateCall()
+//        callManager.sendRequest()
     }
 
     fun reInviteCall() {
@@ -79,8 +84,19 @@ class MainViewModel : ViewModel() {
         private const val TAG = "MainViewModel"
         const val OUTBOUND_ADDRESS = "sip:sip.linphone.org"
         const val OUTBOUND_PORT = "5061"
+//        const val OUTBOUND_ADDRESS = "sip:hongcafew-pbx.peoplev.net"
+//        const val OUTBOUND_PORT = "5479"
         const val REGISTRATION_DURATION = "900"
         val transport = UserAgent.TransportType.TLS
+
+//        const val USER_ID = "sip:1000004@hongcafew-pbx.peoplev.net"
+//        const val COUNTERPART = "1000005"
+//        const val USER_NAME = "everareen"
+//        const val PASSWORD = "1234"
+//        const val USER_ID = "sip:1000005@hongcafew-pbx.peoplev.net"
+//        const val COUNTERPART = "1000004"
+//        const val USER_NAME = "youngtaek.people"
+//        const val PASSWORD = "1234"
 
         const val USER_ID = "sip:everareen@sip.linphone.org"
         const val COUNTERPART = "youngtaek.people"

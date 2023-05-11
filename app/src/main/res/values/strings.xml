@@ -6,6 +6,7 @@
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
     <string name="busy">Busy</string>
+    <string name="ringing">Ringing</string>
     <string name="update">Update</string>
     <string name="re_invite">ReInvite</string>
     <string name="cancel">Cancel</string>

@@ -3,6 +3,8 @@ package kr.young.pjsip
 import kr.young.common.UtilLog.Companion.i
 import kr.young.pjsip.util.Logger
 import org.pjsip.pjsua2.*
+import org.pjsip.pjsua2.pj_ice_sess_trickle.PJ_ICE_SESS_TRICKLE_DISABLED
+import org.pjsip.pjsua2.pj_ice_sess_trickle.PJ_ICE_SESS_TRICKLE_FULL
 
 class UserAgent private constructor() {
     enum class TransportType {
@@ -30,12 +32,12 @@ class UserAgent private constructor() {
     private var ownWorkerThread = false
     private var type = TransportType.UDP
 
-    private var forAsterisk: Boolean? = null
+    private var iceEnable = true
     private var isSRTP: Boolean? = null
     private var isIPv6: Boolean? = null
 
     init {
-        forAsterisk = true
+        iceEnable = true
         isSRTP = false
         isIPv6 = false
     }
@@ -63,7 +65,7 @@ class UserAgent private constructor() {
 
         initLog()
         setUaConfig()
-        if (!forAsterisk!!) {
+        if (iceEnable) {
             setStunServer(stunServer)
         }
 
@@ -83,8 +85,8 @@ class UserAgent private constructor() {
         } else {
             setIpv6(pjsua_ipv6_use.PJSUA_IPV6_DISABLED)
         }
-        setIceEnable(true)
-        if (!forAsterisk!!) {
+        setIceEnable(iceEnable)
+        if (iceEnable) {
             setTurnServer(turnServer, turnUserName, turnPassword)
         }
     }
@@ -240,6 +242,8 @@ class UserAgent private constructor() {
 
     private fun setIceEnable(enable: Boolean): UserAgent {
         accountConfig!!.natConfig.iceEnabled = enable
+        accountConfig!!.natConfig.iceTrickle = if (enable) PJ_ICE_SESS_TRICKLE_FULL else PJ_ICE_SESS_TRICKLE_DISABLED
+        accountConfig!!.natConfig.iceAlwaysUpdate = enable
         return this
     }
 
