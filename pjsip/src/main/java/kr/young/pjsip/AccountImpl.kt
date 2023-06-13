@@ -1,6 +1,7 @@
 package kr.young.pjsip
 
 import kr.young.common.UtilLog.Companion.i
+import kr.young.pjsip.model.CallModel
 import kr.young.pjsip.model.MessageInfo
 import kr.young.pjsip.model.RegistrationInfo
 import kr.young.pjsip.observer.PJSIPObserverImpl
@@ -13,6 +14,28 @@ class AccountImpl(
     private val endpoint: Endpoint
 ): Account() {
     private val observerImpl: PJSIPObserverImpl = PJSIPObserverImpl.instance
+    var buddyImpl: BuddyImpl? = null
+
+    fun addBuddy(buddyConfig: BuddyConfig) {
+        buddyImpl = BuddyImpl(buddyConfig)
+        buddyImpl!!.create(this, buddyConfig)
+        buddyImpl!!.subscribePresence(buddyConfig.subscribe)
+    }
+
+    fun deleteBuddy() {
+        if (buddyImpl != null) {
+            buddyImpl!!.delete()
+        }
+    }
+
+    fun sendBuddy(msg: String) {
+        if (buddyImpl != null) {
+            val param = SendInstantMessageParam()
+            param.contentType = "text/plain"
+            param.content = msg
+            buddyImpl!!.sendInstantMessage(param)
+        }
+    }
 
     override fun onIncomingCall(prm: OnIncomingCallParam?) {
         i(TAG, "onIncomingCall")
@@ -24,6 +47,9 @@ class AccountImpl(
         callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "ringing call"))
         call.answer(callParam)
         CallManager.instance.setCall(call)
+        val model = CallModel(call.info.remoteContact)
+        model.incoming = true
+        CallManager.instance.callModel = model
         observerImpl.onIncomingCallObserver(call.info)
     }
 
@@ -41,8 +67,10 @@ class AccountImpl(
         i(TAG, "onRegState reason : " + info.reason)
         if (prm.code == 200) {
             if (info.expiration == 0L) {
+                CallManager.instance.registrationModel.registered = false
                 observerImpl.onUnRegistrationSuccessObserver(info)
             } else {
+                CallManager.instance.registrationModel.registered = true
                 observerImpl.onRegistrationSuccessObserver(info)
             }
         } else {

@@ -1,5 +1,6 @@
 package kr.young.pjsip
 
+import kr.young.common.UtilLog.Companion.d
 import kr.young.common.UtilLog.Companion.i
 import kr.young.pjsip.util.Logger
 import org.pjsip.pjsua2.*
@@ -32,14 +33,21 @@ class UserAgent private constructor() {
     private var ownWorkerThread = false
     private var type = TransportType.UDP
 
-    private var iceEnable = true
+    private var iceEnable = false
     private var isSRTP: Boolean? = null
     private var isIPv6: Boolean? = null
 
     init {
-        iceEnable = true
+        iceEnable = false
         isSRTP = false
         isIPv6 = false
+    }
+
+    fun print() {
+        d(TAG, "sndIsActive ${endPointImpl!!.audDevManager().sndIsActive()}")
+        d(TAG, "captureDev ${endPointImpl!!.audDevManager().captureDev}")
+        d(TAG, "playbackDev ${endPointImpl!!.audDevManager().playbackDev}")
+        d(TAG, "devCount ${endPointImpl!!.audDevManager().devCount}")
     }
 
     fun init(
@@ -115,6 +123,7 @@ class UserAgent private constructor() {
         /* Shutdown pjsua. Note that Endpoint destructor will also invoke
 		 * libDestroy(), so this will be a test of double libDestroy().
 		 */
+        i(TAG, "stop()")
         try {
             endPointImpl!!.libDestroy()
         } catch (ignored: java.lang.Exception) {
@@ -123,6 +132,7 @@ class UserAgent private constructor() {
         /* Force delete Endpoint here, to avoid deletion from a non-
 		 * registered thread (by GC?).
 		 */
+        i(TAG, "delete()")
         endPointImpl!!.delete()
         endPointImpl = null
     }

@@ -1,6 +1,9 @@
 package kr.young.pjsip
 
+import kr.young.common.UtilLog
 import kr.young.common.UtilLog.Companion.d
+import kr.young.pjsip.model.CallModel
+import kr.young.pjsip.model.RegistrationModel
 import kr.young.pjsip.util.CustomHeader
 import org.pjsip.pjsua2.*
 import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_OK
@@ -8,9 +11,13 @@ import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_OK
 class CallManager private constructor() {
 
     private var call: CallEventListener? = null
+    var callModel: CallModel? = null
 
     private var register = Register.instance
     private var userAgent = UserAgent.instance
+    var registrationModel = RegistrationModel()
+
+    private var buddy: BuddyImpl? = null
 
     fun release() {
         register.release()
@@ -44,12 +51,13 @@ class CallManager private constructor() {
         register.stop()
     }
 
-    fun makeCall(counterpart: String) {
+    fun makeCall(counterpart: String, sipDomain: String) {
+        callModel = CallModel(counterpart)
         call = CallEventListener(userAgent.accountImpl!!, -1, userAgent.endPointImpl!!)
         val callParam = CallOpParam(true)
         callParam.txOption.headers = SipHeaderVector(arrayOf())
         callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "make call"))
-        call?.makeCall("sip:$counterpart@sip.linphone.org", callParam)
+        call?.makeCall("sip:$counterpart@$sipDomain", callParam)
     }
 
     fun answerCall() {
@@ -115,7 +123,24 @@ class CallManager private constructor() {
     }
 
     fun onNetworkChanged() {
+        if (!registrationModel.registered) return
+
         userAgent.onNetworkChanged()
+
+        if (callModel != null) {
+            UtilLog.i(TAG, "outgoing - ${instance.callModel!!.outgoing}")
+            UtilLog.i(TAG, "incoming - ${instance.callModel!!.incoming}")
+            UtilLog.i(TAG, "connected - ${instance.callModel!!.connected}")
+            UtilLog.i(TAG, "terminated - ${instance.callModel!!.terminated}")
+            if (
+                !callModel!!.outgoing &&
+                callModel!!.incoming &&
+                !callModel!!.connected &&
+                !callModel!!.terminated
+            ) {
+                ringingCall()
+            }
+        }
     }
 
     fun setCall(call: CallEventListener?) {
@@ -124,6 +149,22 @@ class CallManager private constructor() {
 
     fun getCall(): CallEventListener? {
         return this.call
+    }
+
+    fun setBuddy(uri: String, isSub: Boolean = false) {
+        val buddyConfig = BuddyConfig()
+        buddyConfig.uri = uri
+        buddyConfig.subscribe = isSub
+
+        userAgent.accountImpl!!.addBuddy(buddyConfig)
+    }
+
+    fun deleteBuddy() {
+        userAgent.accountImpl!!.deleteBuddy()
+    }
+
+    fun sendInstanceMessage(msg: String) {
+        userAgent.accountImpl!!.sendBuddy(msg)
     }
 
     init {

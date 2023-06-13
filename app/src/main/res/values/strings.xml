@@ -12,6 +12,9 @@
     <string name="cancel">Cancel</string>
     <string name="end">End</string>
     <string name="counterpart">Counterpart</string>
+    <string name="buddy">Buddy</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
 
     <string name="call_description">Call</string>
     <string name="message_description">Message</string>

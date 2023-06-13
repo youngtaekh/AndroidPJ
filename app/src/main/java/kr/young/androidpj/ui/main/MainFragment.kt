@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import kr.young.androidpj.R
 import kr.young.androidpj.databinding.FragmentMainBinding
+import kr.young.androidpj.util.NetworkUtil
 import kr.young.common.TouchEffect
 import kr.young.common.UtilLog.Companion.d
 import kr.young.pjsip.model.MessageInfo
@@ -30,6 +31,8 @@ class MainFragment: Fragment(),
 
     private lateinit var binding: FragmentMainBinding
     private lateinit var viewModel: MainViewModel
+
+    private lateinit var networkUtil: NetworkUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +71,10 @@ class MainFragment: Fragment(),
         binding.tvReInvite.setOnTouchListener(this)
         binding.tvEnd.setOnClickListener(this)
         binding.tvEnd.setOnTouchListener(this)
+        binding.tvAdd.setOnClickListener(this)
+        binding.tvAdd.setOnTouchListener(this)
+        binding.tvDel.setOnClickListener(this)
+        binding.tvDel.setOnTouchListener(this)
 
         binding.etCounterpart.setText(MainViewModel.COUNTERPART)
 
@@ -76,6 +83,7 @@ class MainFragment: Fragment(),
 
     override fun onResume() {
         super.onResume()
+        networkUtil = NetworkUtil(requireContext())
         PJSIPObserverImpl.instance.add(this as PJSIPObserver.Register)
         PJSIPObserverImpl.instance.add(this as PJSIPObserver.Message)
         PJSIPObserverImpl.instance.add(this as PJSIPObserver.Call)
@@ -83,6 +91,7 @@ class MainFragment: Fragment(),
 
     override fun onPause() {
         super.onPause()
+        networkUtil.release()
         PJSIPObserverImpl.instance.remove(this as PJSIPObserver.Register)
         PJSIPObserverImpl.instance.remove(this as PJSIPObserver.Message)
         PJSIPObserverImpl.instance.remove(this as PJSIPObserver.Call)
@@ -101,6 +110,8 @@ class MainFragment: Fragment(),
             R.id.tv_update -> { viewModel.updateCall() }
             R.id.tv_re_invite -> { viewModel.reInviteCall() }
             R.id.tv_end -> { viewModel.endCall() }
+            R.id.tv_add -> { viewModel.addBuddy(binding.etCounterpart.text.toString()) }
+            R.id.tv_del -> { viewModel.deleteBuddy() }
         }
     }
 
@@ -137,11 +148,13 @@ class MainFragment: Fragment(),
 
     override fun onRegistrationFailed(registrationInfo: RegistrationInfo) {
         d(TAG, "onRegistrationFailed($registrationInfo)")
+//        networkUtil.release()
         requireActivity().runOnUiThread { viewToggle(isRegister = false) }
     }
 
     override fun onUnRegistrationSuccess(registrationInfo: RegistrationInfo) {
         d(TAG, "onUnRegistrationSuccess($registrationInfo)")
+//        networkUtil.release()
         requireActivity().runOnUiThread { viewToggle(isRegister = false) }
     }
 
@@ -169,6 +182,7 @@ class MainFragment: Fragment(),
         d(TAG, "onConnectedCall")
         requireActivity().runOnUiThread {
             binding.clCall.visibility = VISIBLE
+            binding.tvCounterpart.text = callInfo.remoteContact
             binding.tvAccept.visibility = GONE
             binding.tvDecline.visibility = GONE
             binding.tvBusy.visibility = GONE

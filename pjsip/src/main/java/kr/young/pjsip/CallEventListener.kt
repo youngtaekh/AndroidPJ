@@ -1,6 +1,10 @@
 package kr.young.pjsip
 
+import android.os.Handler
+import android.os.Looper
+import androidx.core.os.postDelayed
 import kr.young.common.UtilLog.Companion.d
+import kr.young.pjsip.model.CallModel
 import kr.young.pjsip.observer.PJSIPObserverImpl
 import org.pjsip.pjsua2.*
 import org.pjsip.pjsua2.pjsip_role_e.PJSIP_ROLE_UAC
@@ -72,6 +76,7 @@ class CallEventListener(
         //role 0 - caller, 1 - callee
         if (info.role == PJSIP_ROLE_UAC) {
             d(TAG, "call role PJSIP_ROLE_UAC")
+            CallManager.instance.callModel!!.outgoing = true
             pjsipObserverImpl.onOutgoingCallObserver(info)
         } else {
             d(TAG, "call role PJSIP_ROLE_UAS")
@@ -95,13 +100,17 @@ class CallEventListener(
 
     private fun onConnectedCall() {
         d(TAG, "PJSIP_INV_STATE_CONFIRMED")
+        CallManager.instance.callModel!!.connected = true
         pjsipObserverImpl.onConnectedCallObserver(info)
     }
 
     private fun onDisconnectedCall() {
         d(TAG, "PJSIP_INV_STATE_DISCONNECTED")
+        CallManager.instance.callModel!!.terminated = true
         pjsipObserverImpl.onTerminatedCallObserver(info)
         endpoint.utilLogWrite(3, TAG, dump(true, ""))
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed(500) { CallManager.instance.stopRegistration() }
     }
 
     companion object {

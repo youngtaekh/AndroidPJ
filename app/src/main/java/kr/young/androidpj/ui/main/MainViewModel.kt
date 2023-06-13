@@ -42,7 +42,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun makeCall(counterpart: String) {
-        callManager.makeCall(counterpart)
+        callManager.makeCall(counterpart, SIP_DOMAIN)
     }
 
     fun answerCall() {
@@ -80,29 +80,44 @@ class MainViewModel : ViewModel() {
         callManager.endCall()
     }
 
+    fun addBuddy(id: String) {
+        d(TAG, "addBuddy")
+        callManager.setBuddy("sip:$id@$SIP_DOMAIN")
+    }
+
+    fun deleteBuddy() {
+        d(TAG, "deleteBuddy")
+//        callManager.deleteBuddy()
+        callManager.sendInstanceMessage("Test Message")
+    }
+
     companion object {
         private const val TAG = "MainViewModel"
-        const val OUTBOUND_ADDRESS = "sip:sip.linphone.org"
-        const val OUTBOUND_PORT = "5061"
-//        const val OUTBOUND_ADDRESS = "sip:hongcafew-pbx.peoplev.net"
-//        const val OUTBOUND_PORT = "5479"
+//        const val OUTBOUND_ADDRESS = "sip:sip.linphone.org"
+//        const val OUTBOUND_PORT = "5061"
+        const val OUTBOUND_ADDRESS = "sip:hongcafew-pbx.peoplev.net"
+        const val OUTBOUND_PORT = "5479"
         const val REGISTRATION_DURATION = "900"
         val transport = UserAgent.TransportType.TLS
 
-//        const val USER_ID = "sip:1000004@hongcafew-pbx.peoplev.net"
-//        const val COUNTERPART = "1000005"
-//        const val USER_NAME = "everareen"
-//        const val PASSWORD = "1234"
+        const val USER_ID = "sip:1000004@hongcafew-pbx.peoplev.net"
+        const val SIP_DOMAIN = "hongcafew-pbx.peoplev.net"
+        const val COUNTERPART = "1000005"
+        const val USER_NAME = "everareen"
+        const val PASSWORD = "1234"
 //        const val USER_ID = "sip:1000005@hongcafew-pbx.peoplev.net"
+//        const val SIP_DOMAIN = "sip.linphone.org"
 //        const val COUNTERPART = "1000004"
 //        const val USER_NAME = "youngtaek.people"
 //        const val PASSWORD = "1234"
 
-        const val USER_ID = "sip:everareen@sip.linphone.org"
-        const val COUNTERPART = "youngtaek.people"
-        const val USER_NAME = "everareen"
-        const val PASSWORD = "lidue638"
+//        const val USER_ID = "sip:everareen@sip.linphone.org"
+//        const val SIP_DOMAIN = "sip.linphone.org"
+//        const val COUNTERPART = "youngtaek.people"
+//        const val USER_NAME = "everareen"
+//        const val PASSWORD = "lidue638"
 //        const val USER_ID = "sip:youngtaek.people@sip.linphone.org"
+//        const val SIP_DOMAIN = "sip.linphone.org"
 //        const val COUNTERPART = "everareen"
 //        const val USER_NAME = "youngtaek.people"
 //        const val PASSWORD = "lidue638"
