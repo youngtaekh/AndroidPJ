@@ -75,7 +75,12 @@ class MainFragment: Fragment(),
         binding.tvAdd.setOnTouchListener(this)
         binding.tvDel.setOnClickListener(this)
         binding.tvDel.setOnTouchListener(this)
+        binding.tvMute.setOnClickListener(this)
+        binding.tvMute.setOnTouchListener(this)
+        binding.tvSpeaker.setOnClickListener(this)
+        binding.tvSpeaker.setOnTouchListener(this)
 
+        binding.clCall.visibility = GONE
         binding.etCounterpart.setText(MainViewModel.COUNTERPART)
 
         return binding.root
@@ -103,6 +108,7 @@ class MainFragment: Fragment(),
             R.id.tv_unregister -> { viewModel.stopRegistration() }
             R.id.tv_refresh -> { viewModel.refreshRegistration() }
             R.id.iv_call -> { viewModel.makeCall(binding.etCounterpart.text.toString()) }
+            R.id.iv_message -> { viewModel.sendMessage("Test Msg") }
             R.id.tv_accept -> { viewModel.answerCall() }
             R.id.tv_decline -> { viewModel.declineCall() }
             R.id.tv_busy -> { viewModel.busyCall() }
@@ -112,6 +118,8 @@ class MainFragment: Fragment(),
             R.id.tv_end -> { viewModel.endCall() }
             R.id.tv_add -> { viewModel.addBuddy(binding.etCounterpart.text.toString()) }
             R.id.tv_del -> { viewModel.deleteBuddy() }
+            R.id.tv_mute -> { mute() }
+            R.id.tv_speaker -> { speaker() }
         }
     }
 
@@ -127,13 +135,10 @@ class MainFragment: Fragment(),
         requireActivity().runOnUiThread {
             binding.clCall.visibility = VISIBLE
             binding.tvCounterpart.text = callInfo.remoteContact
-            binding.tvAccept.visibility = VISIBLE
-            binding.tvDecline.visibility = VISIBLE
-            binding.tvBusy.visibility = VISIBLE
-            binding.tvRinging.visibility = VISIBLE
-            binding.tvUpdate.visibility = GONE
-            binding.tvReInvite.visibility = GONE
-            binding.tvEnd.visibility = GONE
+            binding.ivCall.visibility = GONE
+            binding.llIncoming.visibility = VISIBLE
+            binding.llOutgoing.visibility = GONE
+            binding.llMedia.visibility = GONE
         }
     }
 
@@ -167,14 +172,14 @@ class MainFragment: Fragment(),
         requireActivity().runOnUiThread {
             binding.clCall.visibility = VISIBLE
             binding.tvCounterpart.text = callInfo.remoteContact
-            binding.tvAccept.visibility = GONE
-            binding.tvDecline.visibility = GONE
-            binding.tvBusy.visibility = GONE
-            binding.tvRinging.visibility = GONE
+            binding.ivCall.visibility = GONE
+            binding.llIncoming.visibility = GONE
+            binding.llOutgoing.visibility = VISIBLE
             binding.tvUpdate.visibility = VISIBLE
             binding.tvReInvite.visibility = GONE
             binding.tvEnd.setText(R.string.cancel)
             binding.tvEnd.visibility = VISIBLE
+            binding.llMedia.visibility = VISIBLE
         }
     }
 
@@ -183,14 +188,14 @@ class MainFragment: Fragment(),
         requireActivity().runOnUiThread {
             binding.clCall.visibility = VISIBLE
             binding.tvCounterpart.text = callInfo.remoteContact
-            binding.tvAccept.visibility = GONE
-            binding.tvDecline.visibility = GONE
-            binding.tvBusy.visibility = GONE
-            binding.tvRinging.visibility = GONE
+            binding.ivCall.visibility = GONE
+            binding.llIncoming.visibility = GONE
+            binding.llOutgoing.visibility = VISIBLE
             binding.tvUpdate.visibility = VISIBLE
             binding.tvReInvite.visibility = VISIBLE
             binding.tvEnd.setText(R.string.end)
             binding.tvEnd.visibility = VISIBLE
+            binding.llMedia.visibility = VISIBLE
         }
     }
 
@@ -198,6 +203,10 @@ class MainFragment: Fragment(),
         d(TAG, "onTerminatedCall")
         requireActivity().runOnUiThread {
             binding.clCall.visibility = GONE
+            binding.ivCall.visibility = VISIBLE
+            binding.tvMute.setText(R.string.mute_on)
+            viewModel.speaker(false)
+            binding.tvSpeaker.setText(R.string.speaker_on)
         }
     }
 
@@ -211,10 +220,29 @@ class MainFragment: Fragment(),
 
     override fun onInstantMessage(messageInfo: MessageInfo) {
         d(TAG, "onInstantMessage($messageInfo)")
+        requireActivity().runOnUiThread {
+            binding.tvBuddy.text = messageInfo.message
+        }
     }
 
     override fun onInstantMessageStatus(onInstantMessageStatusParam: OnInstantMessageStatusParam?) {
         d(TAG, "onInstantMessageStatus($onInstantMessageStatusParam)")
+    }
+
+    private fun mute() {
+        if (viewModel.mute()) {
+            binding.tvMute.setText(R.string.mute_off)
+        } else {
+            binding.tvMute.setText(R.string.mute_on)
+        }
+    }
+
+    private fun speaker() {
+        if (viewModel.speaker()) {
+            binding.tvSpeaker.setText(R.string.speaker_off)
+        } else {
+            binding.tvSpeaker.setText(R.string.speaker_on)
+        }
     }
 
     private fun viewToggle(isRegister: Boolean) {

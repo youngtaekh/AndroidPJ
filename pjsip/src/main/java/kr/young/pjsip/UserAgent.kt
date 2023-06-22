@@ -1,6 +1,5 @@
 package kr.young.pjsip
 
-import kr.young.common.UtilLog.Companion.d
 import kr.young.common.UtilLog.Companion.i
 import kr.young.pjsip.util.Logger
 import org.pjsip.pjsua2.*
@@ -41,13 +40,6 @@ class UserAgent private constructor() {
         iceEnable = false
         isSRTP = false
         isIPv6 = false
-    }
-
-    fun print() {
-        d(TAG, "sndIsActive ${endPointImpl!!.audDevManager().sndIsActive()}")
-        d(TAG, "captureDev ${endPointImpl!!.audDevManager().captureDev}")
-        d(TAG, "playbackDev ${endPointImpl!!.audDevManager().playbackDev}")
-        d(TAG, "devCount ${endPointImpl!!.audDevManager().devCount}")
     }
 
     fun init(
@@ -108,6 +100,11 @@ class UserAgent private constructor() {
         accountImpl = null
         epConfig!!.delete()
         epConfig = null
+        /* Force delete Endpoint here, to avoid deletion from a non-
+		 * registered thread (by GC?).
+		 */
+        endPointImpl!!.delete()
+        endPointImpl = null
     }
 
     fun start() {
@@ -129,12 +126,8 @@ class UserAgent private constructor() {
         } catch (ignored: java.lang.Exception) {
         }
 
-        /* Force delete Endpoint here, to avoid deletion from a non-
-		 * registered thread (by GC?).
-		 */
-        i(TAG, "delete()")
-        endPointImpl!!.delete()
-        endPointImpl = null
+        i(TAG, "release()")
+        release()
     }
 
     private fun initLog() {

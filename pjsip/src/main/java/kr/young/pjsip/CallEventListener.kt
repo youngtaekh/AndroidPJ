@@ -4,10 +4,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.os.postDelayed
 import kr.young.common.UtilLog.Companion.d
-import kr.young.pjsip.model.CallModel
 import kr.young.pjsip.observer.PJSIPObserverImpl
 import org.pjsip.pjsua2.*
+import org.pjsip.pjsua2.pjmedia_type.PJMEDIA_TYPE_AUDIO
 import org.pjsip.pjsua2.pjsip_role_e.PJSIP_ROLE_UAC
+import org.pjsip.pjsua2.pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE
 
 class CallEventListener(
     accountImpl: AccountImpl,
@@ -43,8 +44,8 @@ class CallEventListener(
 
         for (i in callMediaInfoVector.indices) {
             val cmi = callMediaInfoVector[i]
-            if (cmi.type == pjmedia_type.PJMEDIA_TYPE_AUDIO && (
-                        cmi.status == pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE ||
+            if (cmi.type == PJMEDIA_TYPE_AUDIO && (
+                        cmi.status == PJSUA_CALL_MEDIA_ACTIVE ||
                                 cmi.status == pjsua_call_media_status.PJSUA_CALL_MEDIA_REMOTE_HOLD)
             ) {
                 // connect ports
@@ -56,7 +57,7 @@ class CallEventListener(
                     println("Failed connecting media ports" + e.message)
                 }
             } else if (cmi.type == pjmedia_type.PJMEDIA_TYPE_VIDEO &&
-                cmi.status == pjsua_call_media_status.PJSUA_CALL_MEDIA_ACTIVE &&
+                cmi.status == PJSUA_CALL_MEDIA_ACTIVE &&
                 cmi.videoIncomingWindowId != pjsua2.INVALID_ID
             ) {
                 vidWin = VideoWindow(cmi.videoIncomingWindowId)
@@ -88,7 +89,7 @@ class CallEventListener(
         d(TAG, "call remoteUri ${info.remoteUri}")
         d(TAG, "call remoteContact ${info.remoteContact}")
 
-//        d(TAG, "event type ${callParam!!.e.type}")
+        d(TAG, "event type ${callParam!!.e.type}")
 //        d(TAG, "tsx prevState ${callParam.e.body.tsxState.prevState}")
 //        d(TAG, "tsx type ${callParam.e.body.tsxState.type}")
 //        d(TAG, "tsx status ${callParam.e.body.tsxState.src.status}")
@@ -111,6 +112,20 @@ class CallEventListener(
         endpoint.utilLogWrite(3, TAG, dump(true, ""))
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(500) { CallManager.instance.stopRegistration() }
+    }
+
+    fun mute(mute: Boolean) {
+        for (i in info.media.indices) {
+            val media = info.media[i]
+            if (media.type == PJMEDIA_TYPE_AUDIO && media.status == PJSUA_CALL_MEDIA_ACTIVE) {
+                val audio = getAudioMedia(i)
+                if (mute) {
+                    endpoint.audDevManager().captureDevMedia.stopTransmit(audio)
+                } else {
+                    endpoint.audDevManager().captureDevMedia.startTransmit(audio)
+                }
+            }
+        }
     }
 
     companion object {

@@ -120,7 +120,6 @@
                 android:id="@+id/cl_call"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
                 app:layout_constraintTop_toBottomOf="@+id/rl_counterpart">
 
                 <TextView
@@ -135,13 +134,14 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
+                    android:id="@+id/ll_incoming"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_counterpart"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    android:paddingVertical="10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_counterpart">
 
                     <TextView
                         android:id="@+id/tv_accept"
@@ -151,8 +151,7 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:layout_marginEnd="10dp"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
 
                     <TextView
                         android:id="@+id/tv_decline"
@@ -162,8 +161,7 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:layout_marginEnd="10dp"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
 
                     <TextView
                         android:id="@+id/tv_busy"
@@ -173,8 +171,7 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:layout_marginEnd="10dp"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
 
                     <TextView
                         android:id="@+id/tv_ringing"
@@ -184,8 +181,19 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:layout_marginEnd="10dp"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_outgoing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:paddingVertical="10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/ll_incoming">
 
                     <TextView
                         android:id="@+id/tv_update"
@@ -195,8 +203,7 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:layout_marginEnd="10dp"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
 
                     <TextView
                         android:id="@+id/tv_re_invite"
@@ -206,8 +213,7 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:layout_marginEnd="10dp"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
 
                     <TextView
                         android:id="@+id/tv_end"
@@ -217,7 +223,38 @@
                         android:textColor="#000000"
                         android:padding="10dp"
                         android:background="#cccccc"
-                        android:visibility="gone" />
+                        android:layout_marginEnd="10dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_media"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:paddingVertical="10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/ll_outgoing">
+
+                    <TextView
+                        android:id="@+id/tv_mute"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mute_on"
+                        android:textColor="#000000"
+                        android:padding="10dp"
+                        android:background="#cccccc"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:id="@+id/tv_speaker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/speaker_on"
+                        android:textColor="#000000"
+                        android:padding="10dp"
+                        android:background="#cccccc" />
 
                 </LinearLayout>
 

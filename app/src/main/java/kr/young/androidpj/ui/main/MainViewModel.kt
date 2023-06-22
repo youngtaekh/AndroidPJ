@@ -1,12 +1,15 @@
 package kr.young.androidpj.ui.main
 
+import android.content.Context.AUDIO_SERVICE
+import android.media.AudioManager
 import androidx.lifecycle.ViewModel
+import kr.young.common.ApplicationUtil
 import kr.young.common.UtilLog.Companion.d
 import kr.young.pjsip.CallManager
 import kr.young.pjsip.UserAgent
 
 class MainViewModel : ViewModel() {
-    private val callManager = CallManager.instance
+    private val manager = CallManager.instance
 
     private fun getOutbound(): String {
         return "$OUTBOUND_ADDRESS:$OUTBOUND_PORT"
@@ -21,7 +24,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun startRegistration() {
-        callManager.startRegistration(
+        manager.startRegistration(
             getOutbound(),
             USER_ID,
             PASSWORD,
@@ -34,61 +37,83 @@ class MainViewModel : ViewModel() {
     }
 
     fun stopRegistration() {
-        callManager.stopRegistration()
+        manager.stopRegistration()
     }
 
     fun refreshRegistration() {
-        callManager.onNetworkChanged()
+        manager.onNetworkChanged()
     }
 
     fun makeCall(counterpart: String) {
-        callManager.makeCall(counterpart, SIP_DOMAIN)
+        manager.makeCall(counterpart, SIP_DOMAIN)
     }
 
     fun answerCall() {
         d(TAG, "answerCall")
-        callManager.answerCall()
+        manager.answerCall()
     }
 
     fun declineCall() {
         d(TAG, "declineCall")
-        callManager.declineCall()
+        manager.declineCall()
     }
 
     fun busyCall() {
         d(TAG, "busyCall")
-        callManager.busyCall()
+        manager.busyCall()
     }
 
     fun ringingCall() {
-        callManager.ringingCall()
+        manager.ringingCall()
     }
 
     fun updateCall() {
         d(TAG, "updateCall")
-        callManager.updateCall()
+        manager.updateCall()
 //        callManager.sendRequest()
     }
 
     fun reInviteCall() {
         d(TAG, "reInviteCall")
-        callManager.reInviteCall()
+        manager.reInviteCall()
     }
 
     fun endCall() {
         d(TAG, "endCall")
-        callManager.endCall()
+        manager.endCall()
+    }
+
+    fun mute(): Boolean {
+        manager.callModel!!.mute = !manager.callModel!!.mute
+        manager.mute(manager.callModel!!.mute)
+        return manager.callModel!!.mute
+    }
+
+    fun speaker(on: Boolean? = null): Boolean {
+        val c = ApplicationUtil.getContext()
+        val audioManager = c!!.getSystemService(AUDIO_SERVICE) as AudioManager
+        if (on == null) {
+            manager.callModel!!.speaker = !manager.callModel!!.speaker
+        } else {
+            manager.callModel!!.speaker = on
+        }
+        audioManager.isSpeakerphoneOn = manager.callModel!!.speaker
+        return manager.callModel!!.speaker
     }
 
     fun addBuddy(id: String) {
         d(TAG, "addBuddy")
-        callManager.setBuddy("sip:$id@$SIP_DOMAIN")
+        manager.setBuddy("sip:$id@$SIP_DOMAIN")
+    }
+
+    fun sendMessage(msg: String) {
+        d(TAG, "sendMessage")
+        manager.sendInstanceMessage(msg)
     }
 
     fun deleteBuddy() {
         d(TAG, "deleteBuddy")
-//        callManager.deleteBuddy()
-        callManager.sendInstanceMessage("Test Message")
+        manager.deleteBuddy()
     }
 
     companion object {
@@ -97,7 +122,7 @@ class MainViewModel : ViewModel() {
 //        const val OUTBOUND_PORT = "5061"
         const val OUTBOUND_ADDRESS = "sip:hongcafew-pbx.peoplev.net"
         const val OUTBOUND_PORT = "5479"
-        const val REGISTRATION_DURATION = "900"
+//        const val REGISTRATION_DURATION = "900"
         val transport = UserAgent.TransportType.TLS
 
         const val USER_ID = "sip:1000004@hongcafew-pbx.peoplev.net"
@@ -105,17 +130,7 @@ class MainViewModel : ViewModel() {
         const val COUNTERPART = "1000005"
         const val USER_NAME = "everareen"
         const val PASSWORD = "1234"
-//        const val USER_ID = "sip:1000005@hongcafew-pbx.peoplev.net"
-//        const val SIP_DOMAIN = "sip.linphone.org"
-//        const val COUNTERPART = "1000004"
-//        const val USER_NAME = "youngtaek.people"
-//        const val PASSWORD = "1234"
 
-//        const val USER_ID = "sip:everareen@sip.linphone.org"
-//        const val SIP_DOMAIN = "sip.linphone.org"
-//        const val COUNTERPART = "youngtaek.people"
-//        const val USER_NAME = "everareen"
-//        const val PASSWORD = "lidue638"
 //        const val USER_ID = "sip:youngtaek.people@sip.linphone.org"
 //        const val SIP_DOMAIN = "sip.linphone.org"
 //        const val COUNTERPART = "everareen"

@@ -17,12 +17,6 @@ class CallManager private constructor() {
     private var userAgent = UserAgent.instance
     var registrationModel = RegistrationModel()
 
-    private var buddy: BuddyImpl? = null
-
-    fun release() {
-        register.release()
-    }
-
     fun startRegistration(
         outboundProxyAddress: String,
         userId: String,
@@ -141,6 +135,10 @@ class CallManager private constructor() {
                 ringingCall()
             }
         }
+    }
+
+    fun mute(mute: Boolean) {
+        this.call?.mute(mute)
     }
 
     fun setCall(call: CallEventListener?) {
