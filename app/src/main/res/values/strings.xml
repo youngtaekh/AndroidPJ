@@ -20,6 +20,7 @@
     <string name="speaker_on">Speaker On</string>
     <string name="speaker_off">Speaker Off</string>
 
+    <string name="default_notification_channel_id">Default</string>
     <string name="call_description">Call</string>
     <string name="message_description">Message</string>
 </resources>
