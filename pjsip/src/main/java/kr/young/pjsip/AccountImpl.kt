@@ -1,13 +1,10 @@
 package kr.young.pjsip
 
 import kr.young.common.UtilLog.Companion.i
-import kr.young.pjsip.model.CallModel
 import kr.young.pjsip.model.MessageInfo
 import kr.young.pjsip.model.RegistrationInfo
 import kr.young.pjsip.observer.PJSIPObserverImpl
-import kr.young.pjsip.util.CustomHeader
 import org.pjsip.pjsua2.*
-import org.pjsip.pjsua2.pjsip_status_code.PJSIP_SC_RINGING
 
 class AccountImpl(
     val accountConfig: AccountConfig,
@@ -40,16 +37,8 @@ class AccountImpl(
     override fun onIncomingCall(prm: OnIncomingCallParam?) {
         i(TAG, "onIncomingCall")
         val call = CallEventListener(this, prm!!.callId, endpoint)
-        //Send 180 Ringing
-        val callParam = CallOpParam()
-        callParam.statusCode = PJSIP_SC_RINGING
-        callParam.txOption.headers = SipHeaderVector(arrayOf())
-        callParam.txOption.headers.add(CustomHeader.make("Custom-Header", "ringing call"))
-        call.answer(callParam)
+
         CallManager.instance.setCall(call)
-        val model = CallModel(call.info.remoteContact)
-        model.incoming = true
-        CallManager.instance.callModel = model
         observerImpl.onIncomingCallObserver(call.info)
     }
 

@@ -1,7 +1,7 @@
 package kr.young.pjsip
 
-import kr.young.common.UtilLog
 import kr.young.common.UtilLog.Companion.d
+import kr.young.common.UtilLog.Companion.i
 import kr.young.pjsip.model.CallModel
 import kr.young.pjsip.model.RegistrationModel
 import kr.young.pjsip.util.CustomHeader
@@ -17,6 +17,10 @@ class CallManager private constructor() {
     private var userAgent = UserAgent.instance
     var registrationModel = RegistrationModel()
 
+    private fun threadInfo() {
+        i(TAG, "Thread - ${Thread.currentThread().name}")
+    }
+
     fun startRegistration(
         outboundProxyAddress: String,
         userId: String,
@@ -28,6 +32,7 @@ class CallManager private constructor() {
         type: UserAgent.TransportType
     ) {
         d(TAG, "startRegistration")
+        threadInfo()
 
         register.start(
             outboundProxyAddress = outboundProxyAddress,
@@ -42,11 +47,17 @@ class CallManager private constructor() {
     }
 
     fun stopRegistration() {
+        threadInfo()
         register.stop()
     }
 
     fun makeCall(counterpart: String, sipDomain: String) {
-        callModel = CallModel(counterpart)
+        if (callModel == null || callModel!!.terminated) {
+            callModel = CallModel(counterpart)
+        } else {
+            callModel!!.counterpart = counterpart
+        }
+        callModel!!.outgoing = true
         call = CallEventListener(userAgent.accountImpl!!, -1, userAgent.endPointImpl!!)
         val callParam = CallOpParam(true)
         callParam.txOption.headers = SipHeaderVector(arrayOf())
@@ -122,10 +133,10 @@ class CallManager private constructor() {
         userAgent.onNetworkChanged()
 
         if (callModel != null) {
-            UtilLog.i(TAG, "outgoing - ${instance.callModel!!.outgoing}")
-            UtilLog.i(TAG, "incoming - ${instance.callModel!!.incoming}")
-            UtilLog.i(TAG, "connected - ${instance.callModel!!.connected}")
-            UtilLog.i(TAG, "terminated - ${instance.callModel!!.terminated}")
+            i(TAG, "outgoing - ${instance.callModel!!.outgoing}")
+            i(TAG, "incoming - ${instance.callModel!!.incoming}")
+            i(TAG, "connected - ${instance.callModel!!.connected}")
+            i(TAG, "terminated - ${instance.callModel!!.terminated}")
             if (
                 !callModel!!.outgoing &&
                 callModel!!.incoming &&

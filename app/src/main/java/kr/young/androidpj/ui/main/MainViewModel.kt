@@ -11,18 +11,6 @@ import kr.young.pjsip.UserAgent
 class MainViewModel : ViewModel() {
     private val manager = CallManager.instance
 
-    private fun getOutbound(): String {
-        return "$OUTBOUND_ADDRESS:$OUTBOUND_PORT"
-    }
-
-    private fun getStun(): String {
-        return "$STUN_ADDRESS:$STUN_PORT"
-    }
-
-    private fun getTurn(): String {
-        return "$TURN_ADDRESS:$TURN_PORT"
-    }
-
     fun startRegistration() {
         manager.startRegistration(
             getOutbound(),
@@ -143,5 +131,17 @@ class MainViewModel : ViewModel() {
         const val TURN_PORT = "80"
         const val TURN_ID = "webrtc@live.com"
         const val TURN_PASSWORD = "muazkh"
+
+        fun getOutbound(): String {
+            return "$OUTBOUND_ADDRESS:$OUTBOUND_PORT"
+        }
+
+        fun getStun(): String {
+            return "$STUN_ADDRESS:$STUN_PORT"
+        }
+
+        fun getTurn(): String {
+            return "$TURN_ADDRESS:$TURN_PORT"
+        }
     }
 }

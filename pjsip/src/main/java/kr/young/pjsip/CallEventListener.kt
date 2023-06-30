@@ -77,7 +77,7 @@ class CallEventListener(
         //role 0 - caller, 1 - callee
         if (info.role == PJSIP_ROLE_UAC) {
             d(TAG, "call role PJSIP_ROLE_UAC")
-            CallManager.instance.callModel!!.outgoing = true
+            CallManager.instance.callModel!!.ringing = true
             pjsipObserverImpl.onOutgoingCallObserver(info)
         } else {
             d(TAG, "call role PJSIP_ROLE_UAS")

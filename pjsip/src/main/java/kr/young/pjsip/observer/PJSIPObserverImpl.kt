@@ -1,5 +1,6 @@
 package kr.young.pjsip.observer
 
+import kr.young.common.UtilLog.Companion.i
 import kr.young.pjsip.CallEventListener
 import kr.young.pjsip.model.MessageInfo
 import kr.young.pjsip.model.RegistrationInfo
@@ -11,6 +12,7 @@ class PJSIPObserverImpl private constructor(): PJSIPPublisher {
     }
 
     companion object {
+        private const val TAG = "PJSIPObserverImpl"
         val instance: PJSIPObserverImpl by lazy { Holder.INSTANCE }
 
 //        @JvmStatic fun getInstance(): PJSIPObserverImpl {
@@ -104,7 +106,10 @@ class PJSIPObserverImpl private constructor(): PJSIPPublisher {
     }
 
     override fun onTerminatedCallObserver(callInfo: CallInfo) {
-        for (observer in this.callObservers) {
+        i(TAG, "onTerminatedCallObserver size ${callObservers.size}")
+        val cp = mutableListOf <PJSIPObserver.Call>()
+        cp.addAll(this.callObservers)
+        for (observer in cp) {
             observer.onTerminatedCall(callInfo)
         }
     }

@@ -1,6 +1,8 @@
 package kr.young.androidpj.ui.main
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.Intent.*
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -9,11 +11,14 @@ import android.view.View.*
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import kr.young.androidpj.CallService
 import kr.young.androidpj.R
+import kr.young.androidpj.ReceiveActivity
 import kr.young.androidpj.databinding.FragmentMainBinding
-import kr.young.androidpj.util.NetworkUtil
 import kr.young.common.TouchEffect
 import kr.young.common.UtilLog.Companion.d
+import kr.young.common.UtilLog.Companion.i
+import kr.young.pjsip.CallManager
 import kr.young.pjsip.model.MessageInfo
 import kr.young.pjsip.model.RegistrationInfo
 import kr.young.pjsip.observer.PJSIPObserver
@@ -32,8 +37,6 @@ class MainFragment: Fragment(),
     private lateinit var binding: FragmentMainBinding
     private lateinit var viewModel: MainViewModel
 
-    private lateinit var networkUtil: NetworkUtil
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
@@ -45,6 +48,8 @@ class MainFragment: Fragment(),
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        i(TAG, "onCreateView")
+
         binding = FragmentMainBinding.inflate(LayoutInflater.from(container!!.context), container, false)
 
         binding.tvRegister.setOnClickListener(this)
@@ -83,20 +88,24 @@ class MainFragment: Fragment(),
         binding.clCall.visibility = GONE
         binding.etCounterpart.setText(MainViewModel.COUNTERPART)
 
+        PJSIPObserverImpl.instance.add(this as PJSIPObserver.Register)
+        PJSIPObserverImpl.instance.add(this as PJSIPObserver.Message)
+        PJSIPObserverImpl.instance.add(this as PJSIPObserver.Call)
+
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        networkUtil = NetworkUtil(requireContext())
-        PJSIPObserverImpl.instance.add(this as PJSIPObserver.Register)
-        PJSIPObserverImpl.instance.add(this as PJSIPObserver.Message)
-        PJSIPObserverImpl.instance.add(this as PJSIPObserver.Call)
+
+        viewToggle(CallManager.instance.registrationModel.registered)
+        if (CallManager.instance.registrationModel.registered) {
+            callView()
+        }
     }
 
-    override fun onPause() {
-        super.onPause()
-        networkUtil.release()
+    override fun onDestroy() {
+        super.onDestroy()
         PJSIPObserverImpl.instance.remove(this as PJSIPObserver.Register)
         PJSIPObserverImpl.instance.remove(this as PJSIPObserver.Message)
         PJSIPObserverImpl.instance.remove(this as PJSIPObserver.Call)
@@ -107,7 +116,7 @@ class MainFragment: Fragment(),
             R.id.tv_register -> { viewModel.startRegistration() }
             R.id.tv_unregister -> { viewModel.stopRegistration() }
             R.id.tv_refresh -> { viewModel.refreshRegistration() }
-            R.id.iv_call -> { viewModel.makeCall(binding.etCounterpart.text.toString()) }
+            R.id.iv_call -> { startCall() }
             R.id.iv_message -> { viewModel.sendMessage("Test Msg") }
             R.id.tv_accept -> { viewModel.answerCall() }
             R.id.tv_decline -> { viewModel.declineCall() }
@@ -131,15 +140,13 @@ class MainFragment: Fragment(),
 
     override fun onIncomingCall(callInfo: CallInfo) {
         d(TAG, "onIncomingCall")
-        requireActivity().runOnUiThread { viewToggle(isRegister = true) }
         requireActivity().runOnUiThread {
-            binding.clCall.visibility = VISIBLE
-            binding.tvCounterpart.text = callInfo.remoteContact
-            binding.ivCall.visibility = GONE
-            binding.llIncoming.visibility = VISIBLE
-            binding.llOutgoing.visibility = GONE
-            binding.llMedia.visibility = GONE
+            viewToggle(isRegister = true)
+            callView()
         }
+        val intent = Intent(context, ReceiveActivity::class.java)
+        intent.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TOP or FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
     }
 
     override fun onRegStarted(onRegStartedParam: OnRegStartedParam?) {
@@ -169,45 +176,17 @@ class MainFragment: Fragment(),
 
     override fun onOutgoingCall(callInfo: CallInfo) {
         d(TAG, "onOutgoingCall")
-        requireActivity().runOnUiThread {
-            binding.clCall.visibility = VISIBLE
-            binding.tvCounterpart.text = callInfo.remoteContact
-            binding.ivCall.visibility = GONE
-            binding.llIncoming.visibility = GONE
-            binding.llOutgoing.visibility = VISIBLE
-            binding.tvUpdate.visibility = VISIBLE
-            binding.tvReInvite.visibility = GONE
-            binding.tvEnd.setText(R.string.cancel)
-            binding.tvEnd.visibility = VISIBLE
-            binding.llMedia.visibility = VISIBLE
-        }
+        requireActivity().runOnUiThread { callView() }
     }
 
     override fun onConnectedCall(callInfo: CallInfo) {
         d(TAG, "onConnectedCall")
-        requireActivity().runOnUiThread {
-            binding.clCall.visibility = VISIBLE
-            binding.tvCounterpart.text = callInfo.remoteContact
-            binding.ivCall.visibility = GONE
-            binding.llIncoming.visibility = GONE
-            binding.llOutgoing.visibility = VISIBLE
-            binding.tvUpdate.visibility = VISIBLE
-            binding.tvReInvite.visibility = VISIBLE
-            binding.tvEnd.setText(R.string.end)
-            binding.tvEnd.visibility = VISIBLE
-            binding.llMedia.visibility = VISIBLE
-        }
+        requireActivity().runOnUiThread { callView() }
     }
 
     override fun onTerminatedCall(callInfo: CallInfo) {
         d(TAG, "onTerminatedCall")
-        requireActivity().runOnUiThread {
-            binding.clCall.visibility = GONE
-            binding.ivCall.visibility = VISIBLE
-            binding.tvMute.setText(R.string.mute_on)
-            viewModel.speaker(false)
-            binding.tvSpeaker.setText(R.string.speaker_on)
-        }
+        requireActivity().runOnUiThread { callView() }
     }
 
     override fun onCallState(callInfo: CallInfo, wholeMsg: String?) {
@@ -227,6 +206,11 @@ class MainFragment: Fragment(),
 
     override fun onInstantMessageStatus(onInstantMessageStatusParam: OnInstantMessageStatusParam?) {
         d(TAG, "onInstantMessageStatus($onInstantMessageStatusParam)")
+    }
+
+    private fun startCall() {
+        viewModel.makeCall(binding.etCounterpart.text.toString())
+        requireContext().startForegroundService(Intent(requireContext(), CallService::class.java))
     }
 
     private fun mute() {
@@ -258,6 +242,33 @@ class MainFragment: Fragment(),
             binding.tvRefresh.visibility = GONE
             binding.ivCall.visibility = GONE
             binding.ivMessage.visibility = GONE
+        }
+    }
+
+    private fun callView() {
+        val terminated = CallManager.instance.callModel?.terminated != false
+        val connected = !terminated && CallManager.instance.callModel?.connected == true
+        val outgoing = !terminated && !connected && CallManager.instance.callModel?.outgoing == true
+        val incoming = !terminated && !connected && CallManager.instance.callModel?.incoming == true
+
+        i(TAG, "terminated $terminated")
+        i(TAG, "connected $connected")
+        i(TAG, "outgoing $outgoing")
+        i(TAG, "incoming $incoming")
+
+        binding.clCall.visibility = if (terminated) GONE else VISIBLE
+        binding.ivCall.visibility = if (terminated) VISIBLE else GONE
+        binding.llIncoming.visibility = if (incoming) VISIBLE else GONE
+        binding.llOutgoing.visibility = if (outgoing || connected) VISIBLE else GONE
+        binding.tvUpdate.visibility = if (outgoing || connected) VISIBLE else GONE
+        binding.tvReInvite.visibility = if (connected) VISIBLE else GONE
+        binding.llMedia.visibility = if (outgoing || connected) VISIBLE else GONE
+        binding.tvEnd.visibility = if (outgoing || connected) VISIBLE else GONE
+        binding.tvEnd.setText(if (connected) R.string.end else R.string.cancel)
+        if (terminated) {
+            binding.tvMute.setText(R.string.mute_on)
+            viewModel.speaker(false)
+            binding.tvSpeaker.setText(R.string.speaker_on)
         }
     }
 
