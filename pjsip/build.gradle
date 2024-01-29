@@ -10,7 +10,7 @@ tasks.register('copySo', Copy) {
 }
 
 tasks.register('copyJava', Copy) {
-    from '../../../../pjproject-2.13/pjsip-apps/src/swig/java/android/pjsua2/src/main/java'
+    from '../../../../Libraries/pjproject-2.13/pjsip-apps/src/swig/java/android/pjsua2/src/main/java'
     into 'src/main/java'
     include('*/*/*/*.java')
 }
